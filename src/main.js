@@ -56,6 +56,8 @@ async function searchImages(query, currentPage) {
       close: true,
     });
 
+    lightbox.refresh();
+
     if (currentPage === 1) {
       gallery.innerHTML = '';
     }
@@ -110,7 +112,7 @@ async function searchImages(query, currentPage) {
         behavior: 'smooth',
       });
     }
-  } catch {
+  } catch (error) {
     hideLoader();
 
     iziToast.error({
