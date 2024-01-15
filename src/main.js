@@ -44,6 +44,7 @@ async function searchImages(query, currentPage) {
     const response = await axios.get(
       `https://pixabay.com/api/?${searchParams}`
     );
+
     hideLoader();
 
     const { hits, totalHits } = response.data;
@@ -128,6 +129,7 @@ searchForm.addEventListener('submit', event => {
 
   const query = searchInput.value.trim();
   currentPage = 1;
+  loadMoreButton.style.display = 'none';
   searchImages(query, currentPage);
   searchForm.reset();
 });
