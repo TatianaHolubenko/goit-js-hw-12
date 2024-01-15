@@ -14,6 +14,7 @@ const loadMoreButton = document.querySelector('.load-more-button');
 const API_KEY = '41764451-f0ee5e8d00846e21c9f97a054';
 let currentPage = 1;
 const perPage = 40;
+let searchQuery = '';
 
 function showLoader() {
   loaderContainer.style.display = 'block';
@@ -22,19 +23,18 @@ function hideLoader() {
   loaderContainer.style.display = 'none';
 }
 
-let requestParams = {
-  key: API_KEY,
-  q: '',
-  image_type: 'photo',
-  orientation: 'horizontal',
-  safesearch: true,
-  page: currentPage,
-  per_page: perPage,
-};
-
 async function searchImages(query, currentPage) {
-  requestParams.q = query;
-  requestParams.page = currentPage;
+  searchQuery = query;
+
+  const requestParams = {
+    key: API_KEY,
+    q: searchQuery,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: true,
+    page: currentPage,
+    per_page: perPage,
+  };
 
   const searchParams = new URLSearchParams(requestParams);
 
@@ -44,18 +44,9 @@ async function searchImages(query, currentPage) {
     const response = await axios.get(
       `https://pixabay.com/api/?${searchParams}`
     );
-
     hideLoader();
-    const { hits, totalHits } = response.data;
 
-    if (hits.length === 0) {
-      iziToast.error({
-        title: 'Error',
-        message: "We're sorry, but you've reached the end of search results.",
-        position: 'topRight',
-      });
-      return;
-    }
+    const { hits, totalHits } = response.data;
 
     const gallery = document.querySelector('.gallery');
 
@@ -106,7 +97,7 @@ async function searchImages(query, currentPage) {
       loadMoreButton.style.display = 'none';
       iziToast.error({
         title: 'Error',
-        message: error.message,
+        message: "We're sorry, but you've reached the end of search results.",
         position: 'topRight',
       });
     } else {
@@ -121,6 +112,7 @@ async function searchImages(query, currentPage) {
     }
   } catch {
     hideLoader();
+
     iziToast.error({
       title: 'Error',
       message: error.message,
@@ -132,14 +124,13 @@ async function searchImages(query, currentPage) {
 searchForm.addEventListener('submit', event => {
   event.preventDefault();
 
-  const searchQuery = searchInput.value.trim();
+  const query = searchInput.value.trim();
   currentPage = 1;
-  searchImages(searchQuery);
+  searchImages(query, currentPage);
   searchForm.reset();
 });
 
 loadMoreButton.addEventListener('click', () => {
   currentPage += 1;
-  const searchQuery = searchInput.value.trim();
-  searchImages(searchQuery);
+  searchImages(searchQuery, currentPage);
 });
